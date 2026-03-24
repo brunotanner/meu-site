@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bruno Tanner — Contador & Consultor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    html { scroll-behavior: smooth; }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .navbar-scrolled {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background-color: rgba(15, 23, 42, 0.88) !important;
+    }
+
+    .service-card {
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .service-card:hover {
+      border-color: #22C55E !important;
+      box-shadow: 0 0 0 1px #22C55E22;
+    }
+
+    .whatsapp-float {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9999;
+      background: #22C55E;
+      border-radius: 50%;
+      width: 58px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(34, 197, 94, 0.45);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .whatsapp-float:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 28px rgba(34, 197, 94, 0.55);
+    }
+
+    /* Mobile nav toggle */
+    .mobile-menu { display: none; }
+    .mobile-menu.open { display: flex; }
+  </style>
+
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1259566205618125');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1259566205618125&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
+</head>
+<body class="bg-[#0F172A]">
+
+<!-- WhatsApp Float -->
+<a href="https://wa.me/5547991256188" target="_blank" rel="noopener" class="whatsapp-float" aria-label="Falar no WhatsApp">
+  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="white">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+
+<!-- ====== NAVBAR ====== -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-[#0F172A] transition-all duration-300">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="#" class="text-white font-bold text-xl tracking-tight">
+      Bruno Tanner<span class="text-[#22C55E]">.</span>
+    </a>
+
+    <!-- Desktop links -->
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#servicos" class="text-[#CBD5E1] hover:text-white text-sm font-medium transition-colors">Serviços</a>
+      <a href="#para-quem" class="text-[#CBD5E1] hover:text-white text-sm font-medium transition-colors">Para quem é</a>
+      <a href="#depoimentos" class="text-[#CBD5E1] hover:text-white text-sm font-medium transition-colors">Depoimentos</a>
+      <a href="#contato" class="text-[#CBD5E1] hover:text-white text-sm font-medium transition-colors">Contato</a>
+    </div>
+
+    <a href="https://wa.me/5547991256188" target="_blank" rel="noopener"
+       class="hidden md:inline-flex bg-[#22C55E] text-[#0F172A] font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-green-400 transition-colors">
+      Falar no WhatsApp
+    </a>
+
+    <!-- Mobile hamburger -->
+    <button id="menuBtn" class="md:hidden text-white" aria-label="Menu">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile menu -->
+  <div id="mobileMenu" class="mobile-menu md:hidden flex-col px-6 pb-4 gap-4 border-t border-white/10">
+    <a href="#servicos" class="text-[#CBD5E1] text-sm py-2" onclick="closeMobileMenu()">Serviços</a>
+    <a href="#para-quem" class="text-[#CBD5E1] text-sm py-2" onclick="closeMobileMenu()">Para quem é</a>
+    <a href="#depoimentos" class="text-[#CBD5E1] text-sm py-2" onclick="closeMobileMenu()">Depoimentos</a>
+    <a href="#contato" class="text-[#CBD5E1] text-sm py-2" onclick="closeMobileMenu()">Contato</a>
+    <a href="https://wa.me/5547991256188" target="_blank" rel="noopener"
+       class="bg-[#22C55E] text-[#0F172A] font-semibold text-sm px-5 py-3 rounded-lg text-center">
+      Falar no WhatsApp
+    </a>
+  </div>
+</nav>
+
+<!-- ====== HERO ====== -->
+<section class="bg-[#0F172A] min-h-screen flex items-center pt-20">
+  <div class="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-14 items-center">
+
+    <!-- Texto -->
+    <div class="fade-in">
+      <div class="inline-flex items-center gap-2 bg-[#22C55E]/10 border border-[#22C55E]/30 text-[#22C55E] text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#22C55E] inline-block"></span>
+        Contador &amp; Consultor
+      </div>
+
+      <h1 class="text-4xl md:text-5xl lg:text-[3.25rem] font-extrabold text-white leading-tight mb-6">
+        Sua vida financeira organizada.<br>
+        <span class="text-[#22C55E]">Sem complicação.</span>
+      </h1>
+
+      <p class="text-[#CBD5E1] text-lg leading-relaxed mb-8 max-w-lg">
+        Sou o Bruno Tanner, contador especialista em prestadores de serviço.
+        Traduzo números em decisões — e te mostro exatamente o que fazer com eles.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <a href="https://wa.me/5547991256188" target="_blank" rel="noopener"
+           class="bg-[#22C55E] text-[#0F172A] font-bold px-6 py-4 rounded-xl text-center hover:bg-green-400 transition-colors text-sm md:text-base">
+          Quero organizar minha vida financeira
+        </a>
+        <a href="#servicos"
+           class="border border-white/25 text-white font-semibold px-6 py-4 rounded-xl text-center hover:bg-white/5 transition-colors text-sm md:text-base">
+          Ver serviços
+        </a>
+      </div>
+    </div>
+
+    <!-- Foto -->
+    <div class="fade-in flex justify-center md:justify-end order-first md:order-last">
+      <div class="relative">
+        <div class="absolute -inset-4 bg-[#22C55E]/15 rounded-3xl blur-3xl"></div>
+        <img
+          src="https://lh3.googleusercontent.com/d/1W_HsmGkPylt81t8UHFSToRqZ9CRzc_4G=w800"
+          alt="Bruno Tanner — Contador"
+          class="relative w-72 md:w-80 lg:w-96 h-auto object-cover rounded-2xl border border-white/10 shadow-2xl"
+        />
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ====== SERVIÇOS ====== -->
+<section id="servicos" class="bg-white py-24">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-14 fade-in">
+      <h2 class="text-3xl md:text-4xl font-bold text-[#0F172A] mb-3">O que eu faço por você</h2>
+      <p class="text-[#475569] text-lg">Serviços diretos, sem enrolação.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5">
+
+      <!-- Card 1 -->
+      <div class="service-card fade-in border border-gray-200 rounded-2xl p-6 cursor-default">
+        <div class="w-11 h-11 bg-[#F0FDF4] rounded-xl flex items-center justify-center mb-5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10,9 9,9 8,9"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-[#0F172A] text-base mb-2">Contabilidade e Fiscal</h3>
+        <p class="text-[#475569] text-sm leading-relaxed">Escrituração, obrigações e tudo em dia com o Fisco.</p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="service-card fade-in border border-gray-200 rounded-2xl p-6 cursor-default">
+        <div class="w-11 h-11 bg-[#F0FDF4] rounded-xl flex items-center justify-center mb-5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-[#0F172A] text-base mb-2">Apuração de Tributos</h3>
+        <p class="text-[#475569] text-sm leading-relaxed">Quanto você deve pagar — e como pagar menos dentro da lei.</p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="service-card fade-in border border-gray-200 rounded-2xl p-6 cursor-default">
+        <div class="w-11 h-11 bg-[#F0FDF4] rounded-xl flex items-center justify-center mb-5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-[#0F172A] text-base mb-2">Consultoria para Decisão</h3>
+        <p class="text-[#475569] text-sm leading-relaxed">Dados claros para você decidir com segurança.</p>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="service-card fade-in border border-gray-200 rounded-2xl p-6 cursor-default">
+        <div class="w-11 h-11 bg-[#F0FDF4] rounded-xl flex items-center justify-center mb-5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-[#0F172A] text-base mb-2">Regularização Fiscal</h3>
+        <p class="text-[#475569] text-sm leading-relaxed">Situação irregular? A gente resolve, sem drama.</p>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="service-card fade-in border border-gray-200 rounded-2xl p-6 cursor-default">
+        <div class="w-11 h-11 bg-[#F0FDF4] rounded-xl flex items-center justify-center mb-5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-[#0F172A] text-base mb-2">Imposto de Renda</h3>
+        <p class="text-[#475569] text-sm leading-relaxed">Declaração correta, restituição maximizada.</p>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="service-card fade-in border border-gray-200 rounded-2xl p-6 cursor-default">
+        <div class="w-11 h-11 bg-[#F0FDF4] rounded-xl flex items-center justify-center mb-5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9,22 9,12 15,12 15,22"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-[#0F172A] text-base mb-2">Bens e Patrimônio</h3>
+        <p class="text-[#475569] text-sm leading-relaxed">Organize, proteja e planeje o que você construiu.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ====== PARA QUEM É ====== -->
+<section id="para-quem" class="bg-[#F0FDF4] py-24">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-14 fade-in">
+      <h2 class="text-3xl md:text-4xl font-bold text-[#0F172A] mb-3">Para quem é isso?</h2>
+      <p class="text-[#475569] text-lg">Se você se reconhece aqui, é pra você que eu trabalho.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <!-- Card 1 -->
+      <div class="fade-in bg-white border-l-4 border-[#22C55E] rounded-2xl p-7 shadow-sm">
+        <span class="inline-block bg-[#22C55E]/10 text-[#22C55E] text-xs font-bold px-3 py-1 rounded-full mb-5">
+          Autônomo / Freelancer
+        </span>
+        <h3 class="font-bold text-[#0F172A] text-lg mb-3">Você mistura tudo e nunca sobra</h3>
+        <p class="text-[#475569] text-sm leading-relaxed">
+          Recebe por fora, mistura conta pessoal com a empresa, não tem noção do lucro do seu negócio. Isso tem solução.
+        </p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="fade-in bg-white border-l-4 border-[#22C55E] rounded-2xl p-7 shadow-sm">
+        <span class="inline-block bg-[#22C55E]/10 text-[#22C55E] text-xs font-bold px-3 py-1 rounded-full mb-5">
+          MEI / Empresa Nova
+        </span>
+        <h3 class="font-bold text-[#0F172A] text-lg mb-3">Abriu empresa, mas caminha no escuro</h3>
+        <p class="text-[#475569] text-sm leading-relaxed">
+          Não entende pró-labore, distribuição de lucros ou qual regime tributário faz sentido. Te ajudo a resolver.
+        </p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="fade-in bg-white border-l-4 border-[#22C55E] rounded-2xl p-7 shadow-sm">
+        <span class="inline-block bg-[#22C55E]/10 text-[#22C55E] text-xs font-bold px-3 py-1 rounded-full mb-5">
+          Negócio em Crescimento
+        </span>
+        <h3 class="font-bold text-[#0F172A] text-lg mb-3">Fatura bem, zero gestão</h3>
+        <p class="text-[#475569] text-sm leading-relaxed">
+          Quer melhorar margem, ter previsibilidade e parar de apagar incêndio. É aqui que você escala.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ====== DEPOIMENTOS ====== -->
+<section id="depoimentos" class="bg-[#0F172A] py-24">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-14 fade-in">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">O que dizem os clientes</h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <!-- Depoimento 1 -->
+      <div class="fade-in bg-[#1E293B] rounded-2xl p-7">
+        <span class="text-[#22C55E] text-5xl font-serif leading-none select-none">"</span>
+        <p class="text-[#CBD5E1] text-sm leading-relaxed mt-2 mb-7">
+          Eu não entendia nada de imposto. O Bruno explicou tudo de um jeito simples e ainda me ajudou a pagar menos na declaração. Recomendo demais.
+        </p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-[#22C55E] flex items-center justify-center text-[#0F172A] font-bold text-sm shrink-0">A</div>
+          <div>
+            <div class="text-white text-sm font-semibold">Ana Paula S.</div>
+            <div class="text-[#64748B] text-xs mt-0.5">Designer Freelancer</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Depoimento 2 -->
+      <div class="fade-in bg-[#1E293B] rounded-2xl p-7">
+        <span class="text-[#22C55E] text-5xl font-serif leading-none select-none">"</span>
+        <p class="text-[#CBD5E1] text-sm leading-relaxed mt-2 mb-7">
+          Abri minha empresa sem saber nada de contabilidade. Ele organizou tudo, me explicou o pró-labore e agora tenho clareza total dos números.
+        </p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-[#22C55E] flex items-center justify-center text-[#0F172A] font-bold text-sm shrink-0">R</div>
+          <div>
+            <div class="text-white text-sm font-semibold">Ricardo M.</div>
+            <div class="text-[#64748B] text-xs mt-0.5">Consultor de TI</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Depoimento 3 -->
+      <div class="fade-in bg-[#1E293B] rounded-2xl p-7">
+        <span class="text-[#22C55E] text-5xl font-serif leading-none select-none">"</span>
+        <p class="text-[#CBD5E1] text-sm leading-relaxed mt-2 mb-7">
+          Estava com uma dívida no Simples Nacional que parecia impossível de resolver. Em 30 dias estava regularizado. Profissional de verdade.
+        </p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-[#22C55E] flex items-center justify-center text-[#0F172A] font-bold text-sm shrink-0">C</div>
+          <div>
+            <div class="text-white text-sm font-semibold">Carla F.</div>
+            <div class="text-[#64748B] text-xs mt-0.5">Proprietária de e-commerce</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ====== CTA FINAL ====== -->
+<section id="contato" class="bg-[#22C55E] py-24">
+  <div class="max-w-3xl mx-auto px-6 text-center fade-in">
+    <h2 class="text-3xl md:text-5xl font-extrabold text-[#0F172A] mb-5 leading-tight">
+      Pronto para parar de adivinhar e começar a decidir com clareza?
+    </h2>
+    <p class="text-[#0F172A]/65 text-lg mb-10">Manda uma mensagem agora. Respondo pessoalmente.</p>
+    <a href="https://wa.me/5547991256188" target="_blank" rel="noopener"
+       class="inline-flex items-center gap-3 bg-[#0F172A] text-white font-bold text-base md:text-lg px-8 py-5 rounded-2xl hover:bg-[#1E293B] transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      Fale comigo no WhatsApp
+    </a>
+  </div>
+</section>
+
+<!-- ====== FOOTER ====== -->
+<footer class="bg-[#0F172A] border-t-2 border-[#22C55E]">
+  <div class="max-w-6xl mx-auto px-6 py-12">
+    <div class="grid md:grid-cols-3 gap-10 mb-10">
+
+      <!-- Esquerda -->
+      <div>
+        <div class="text-white font-bold text-xl mb-2">Bruno Tanner<span class="text-[#22C55E]">.</span></div>
+        <p class="text-[#475569] text-sm">Contabilidade que faz sentido.</p>
+      </div>
+
+      <!-- Centro -->
+      <div class="flex flex-col gap-2">
+        <span class="text-[#64748B] text-xs font-semibold uppercase tracking-wider mb-1">Links Rápidos</span>
+        <a href="#servicos" class="text-[#94A3B8] hover:text-white text-sm transition-colors">Serviços</a>
+        <a href="#para-quem" class="text-[#94A3B8] hover:text-white text-sm transition-colors">Para quem é</a>
+        <a href="#contato" class="text-[#94A3B8] hover:text-white text-sm transition-colors">Contato</a>
+      </div>
+
+      <!-- Direita -->
+      <div>
+        <span class="text-[#64748B] text-xs font-semibold uppercase tracking-wider mb-3 block">Redes</span>
+        <div class="flex items-center gap-4">
+          <a href="https://instagram.com/brunotanner" target="_blank" rel="noopener" class="text-[#94A3B8] hover:text-[#22C55E] transition-colors" aria-label="Instagram">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+            </svg>
+          </a>
+          <a href="https://wa.me/5547991256188" target="_blank" rel="noopener"
+             class="text-[#94A3B8] hover:text-[#22C55E] transition-colors" aria-label="WhatsApp">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="border-t border-[#1E293B] pt-6 text-center">
+      <p class="text-[#475569] text-sm">© 2026 Bruno Tanner. Todos os direitos reservados.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Navbar scroll blur
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('navbar-scrolled', window.scrollY > 50);
+  });
+
+  // Mobile menu
+  const menuBtn = document.getElementById('menuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+  function closeMobileMenu() { mobileMenu.classList.remove('open'); }
+
+  // Fade-in on scroll
+  const fadeEls = document.querySelectorAll('.fade-in');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 70);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  fadeEls.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

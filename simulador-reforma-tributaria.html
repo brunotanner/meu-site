@@ -175,7 +175,7 @@ footer .fcopy{ font-size:11.5px; color:var(--text-3); }
   </div>
 
   <div class="disclaimer">
-    Esta é uma simulação simplificada. O crédito de CBS embutido no DAS usa a tabela de partilha oficial do Simples Nacional por faixa (Anexo III, transição 2027-2028); a CBS+IBS do híbrido usa a alíquota estimada de 8,9% ainda não fixada em lei. Os números não substituem uma simulação personalizada nem orientação contábil individual. Nenhuma decisão de regime tributário deve ser tomada apenas com base neste resultado.
+    Esta é uma simulação simplificada. O crédito embutido no DAS soma as colunas de CBS e IBS da tabela de partilha oficial do Simples Nacional por faixa (Anexo III, transição 2027-2028, Resolução CGSN nº 190/2026). A CBS+IBS do híbrido usa 9,0%, sendo o IBS de 0,1% já fixado em lei (art. 344 da LC 214/2025) e a CBS de 8,9% calculada sobre uma alíquota de referência de 9% que ainda será definida pelo Senado. Os números não substituem uma simulação personalizada nem orientação contábil individual. Nenhuma decisão de regime tributário deve ser tomada apenas com base neste resultado.
   </div>
 
   <div class="cta">
@@ -237,26 +237,31 @@ function aplicarMascaraMilhar(id){
 aplicarMascaraMilhar('nota');
 aplicarMascaraMilhar('despesas');
 
-// Percentual de CBS embutido no DAS (partilha oficial do Simples Nacional,
-// Anexo III, tabela de transição 2027-2028 — Resolução CGSN / LC 214/2025).
-// Cada faixa tem um percentual fixo de CBS dentro do DAS; o IBS fica de fora
-// deste cálculo porque, na transição, o ISS permanece no DAS (só migra pra
-// IBS gradualmente entre 2029 e 2032 — ver capítulo 3 do guia).
+// Percentual de CBS e IBS embutidos no DAS (tabela de partilha oficial do
+// Simples Nacional, Anexo III, transição 2027-2028, conforme Resolução
+// CGSN nº 190/2026, que adapta a Resolução CGSN nº 140/2018 à LC 214/2025).
+// O crédito que o optante do Simples unificado transfere ao cliente é
+// limitado a esses percentuais (LC 214/2025, art. 47, §9º), e soma as duas
+// colunas: mesmo com o ISS ainda dentro do DAS na transição, a tabela já
+// traz uma parcela de IBS em cada faixa.
 // Faixas identificadas pela alíquota efetiva (fórmula oficial RBT12 x alíquota
 // nominal - parcela a deduzir, dividido por RBT12):
 var FAIXAS_ANEXO_III = [
-  { max: 6.00,  cbs: 15.43 },  // Faixa 1 — até R$180 mil
-  { max: 8.60,  cbs: 16.91 },  // Faixa 2 — R$180 a 360 mil
-  { max: 11.05, cbs: 16.41 },  // Faixa 3 — R$360 a 720 mil
-  { max: 14.02, cbs: 16.41 },  // Faixa 4 — R$720 mil a 1,8 mi
-  { max: 17.51, cbs: 15.43 },  // Faixa 5 — R$1,8 a 3,6 mi
-  { max: Infinity, cbs: 19.29 } // Faixa 6 — R$3,6 a 4,8 mi (ISS/ICMS fora do DAS)
+  { max: 6.00,  cbs: 15.43, ibs: 0.17 },  // Faixa 1 — até R$180 mil
+  { max: 8.60,  cbs: 16.91, ibs: 0.19 },  // Faixa 2 — R$180 a 360 mil
+  { max: 11.05, cbs: 16.41, ibs: 0.19 },  // Faixa 3 — R$360 a 720 mil
+  { max: 14.02, cbs: 16.41, ibs: 0.19 },  // Faixa 4 — R$720 mil a 1,8 mi
+  { max: 17.51, cbs: 15.43, ibs: 0.17 },  // Faixa 5 — R$1,8 a 3,6 mi
+  { max: Infinity, cbs: 19.29, ibs: 0 }   // Faixa 6 — R$3,6 a 4,8 mi (ISS/ICMS fora do DAS)
 ];
-function fracaoCBS(aliquotaPct){
+function fracaoCbsIbs(aliquotaPct){
   for (var i = 0; i < FAIXAS_ANEXO_III.length; i++){
-    if (aliquotaPct <= FAIXAS_ANEXO_III[i].max) return FAIXAS_ANEXO_III[i].cbs / 100;
+    if (aliquotaPct <= FAIXAS_ANEXO_III[i].max){
+      return (FAIXAS_ANEXO_III[i].cbs + FAIXAS_ANEXO_III[i].ibs) / 100;
+    }
   }
-  return FAIXAS_ANEXO_III[FAIXAS_ANEXO_III.length - 1].cbs / 100;
+  var ultima = FAIXAS_ANEXO_III[FAIXAS_ANEXO_III.length - 1];
+  return (ultima.cbs + ultima.ibs) / 100;
 }
 
 // Tabela oficial do Anexo III do Simples Nacional (LC 123/2006, art. 18,
@@ -334,17 +339,19 @@ document.getElementById('btn-simular').addEventListener('click', function(){
   }
 
   var a = aliquota / 100;
-  var fracaoCbs = fracaoCBS(aliquota);
-  var cbsEmbutidoRate = a * fracaoCbs;
-  var dasHibridoRate = a - cbsEmbutidoRate;
+  var fracaoEmbutida = fracaoCbsIbs(aliquota);
+  var cbsIbsEmbutidoRate = a * fracaoEmbutida;
+  var dasHibridoRate = a - cbsIbsEmbutidoRate;
 
-  var cbsIbsRate = 0.089;
+  // Alíquotas de 2027-2028: CBS de 8,9% (referência de 9% reduzida em 0,1 ponto
+  // pelo art. 347 da LC 214/2025) mais IBS de 0,1% (art. 344), somando 9,0%.
+  var cbsIbsRate = 0.089 + 0.001;
   if (regulamentada) cbsIbsRate = cbsIbsRate * 0.7;
 
   // Simples puro
   var impostoPuro = nota * a;
   var liquidoPuro = nota - impostoPuro;
-  var creditoPuro = nota * cbsEmbutidoRate;
+  var creditoPuro = nota * cbsIbsEmbutidoRate;
   var custoClientePuro = nota - creditoPuro;
 
   // Simples híbrido

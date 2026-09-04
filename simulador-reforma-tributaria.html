@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador da Reforma Tributária | Bruno Tanner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; font-family:'Plus Jakarta Sans',sans-serif; }
+:root{
+  --bg:#0B0A14; --surface:rgba(255,255,255,0.035); --surface-2:#14121F;
+  --border:rgba(255,255,255,0.12); --border-strong:rgba(139,127,255,0.4);
+  --text:#F4F2FA; --text-2:#B8B3CC; --text-3:#8A84A0;
+  --accent:#8B7FFF; --accent-strong:#6C63FF; --accent-deep:#4338CA;
+  --green:#4ADE80; --red:#F87171; --amber:#FBBF24; --amber-bg:rgba(251,191,36,0.08); --amber-border:rgba(251,191,36,0.3);
+}
+html{ scroll-behavior:smooth; }
+body{ background:var(--bg); color:var(--text-2); }
+a{ color:var(--accent); }
+.wrap{ max-width:640px; margin:0 auto; padding:28px 20px 60px; }
+
+.navbar{ max-width:900px; margin:0 auto; padding:22px 20px; display:flex; align-items:center; justify-content:space-between; }
+.navbar a.brand{ display:flex; align-items:center; gap:9px; color:var(--text); text-decoration:none; }
+.navbar .mark{ width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,var(--accent-strong),var(--accent-deep)); display:flex; align-items:center; justify-content:center; }
+.navbar .mark span{ color:#fff; font-weight:800; font-size:11px; }
+.navbar .brand-name{ font-weight:700; font-size:14.5px; }
+.navbar .back{ font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--text-3); text-decoration:none; display:flex; align-items:center; gap:6px; }
+.navbar .back:hover{ color:var(--text); }
+
+.eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; }
+h1{ font-size:26px; font-weight:800; color:var(--text); letter-spacing:-.02em; line-height:1.25; margin-bottom:12px; }
+.lead{ font-size:13.5px; line-height:1.65; margin-bottom:26px; color:var(--text-2); }
+
+.card{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px; margin-bottom:18px; }
+
+.field{ margin-bottom:16px; }
+.field label{ display:block; font-size:12.5px; font-weight:700; color:var(--text); margin-bottom:7px; }
+.field .hint{ display:block; font-size:11px; color:var(--text-3); margin-top:5px; font-weight:400; line-height:1.4; }
+.field input[type="number"], .field input[type="text"]{
+  width:100%; font-size:15px; font-weight:600; color:var(--text);
+  border:1.5px solid var(--border); border-radius:10px; padding:11px 13px;
+  background:var(--surface-2); outline:none; transition:border-color .15s;
+}
+.field input[type="number"]::placeholder, .field input[type="text"]::placeholder{ color:var(--text-3); font-weight:500; }
+.field input[type="number"]:focus, .field input[type="text"]:focus{ border-color:var(--accent); }
+.prefix-wrap{ position:relative; }
+.prefix-wrap .prefix{ position:absolute; left:13px; top:50%; transform:translateY(-50%); font-size:14px; font-weight:700; color:var(--text-3); pointer-events:none; }
+.prefix-wrap input{ padding-left:34px !important; }
+.suffix-wrap{ position:relative; }
+.suffix-wrap .suffix{ position:absolute; right:13px; top:50%; transform:translateY(-50%); font-size:14px; font-weight:700; color:var(--text-3); pointer-events:none; }
+
+.checkbox-row{ display:flex; align-items:flex-start; gap:10px; font-size:12.5px; color:var(--text-2); line-height:1.5; cursor:pointer; margin-bottom:4px; }
+.checkbox-row input{ margin-top:2px; width:16px; height:16px; accent-color:var(--accent); flex-shrink:0; }
+
+button#btn-simular{
+  width:100%; margin-top:6px; background:linear-gradient(135deg,var(--accent-strong),var(--accent-deep)); color:#fff; border:none; border-radius:12px;
+  padding:15px; font-size:14.5px; font-weight:700; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;
+}
+button#btn-simular:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(108,99,255,0.35); }
+button#btn-simular:active{ transform:scale(.99); }
+button#btn-simular:disabled{ background:var(--text-3); cursor:not-allowed; transform:none; box-shadow:none; }
+
+.error-msg{ display:none; background:var(--amber-bg); border:1px solid var(--amber-border); color:var(--amber); font-size:12px; font-weight:600; border-radius:10px; padding:10px 13px; margin-bottom:14px; }
+
+.result-title{ font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:4px; }
+.result-h2{ font-size:19px; font-weight:800; color:var(--text); margin-bottom:16px; letter-spacing:-.01em; }
+
+table.cmp{ width:100%; border-collapse:collapse; margin-bottom:16px; }
+table.cmp th{ background:var(--surface-2); color:var(--text); font-size:11.5px; font-weight:700; text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+table.cmp th:first-child{ border-radius:10px 0 0 0; }
+table.cmp th:last-child{ border-radius:0 10px 0 0; }
+table.cmp td{ font-size:12.5px; color:var(--text-2); padding:10px 12px; border-bottom:1px solid var(--border); }
+table.cmp tr:nth-child(even) td{ background:rgba(255,255,255,0.02); }
+table.cmp td.strong{ font-weight:800; color:var(--text); }
+table.cmp td.up{ color:var(--red); font-weight:700; }
+table.cmp td.good{ color:var(--green); font-weight:700; }
+
+.callout{ border-radius:14px; padding:16px 18px; font-size:12.5px; line-height:1.6; margin-bottom:14px; }
+.callout-accent{ background:linear-gradient(135deg,var(--accent-strong),var(--accent-deep)); color:#fff; }
+.callout-accent b{ color:#fff; }
+.callout-soft{ background:var(--surface-2); border:1px solid var(--border); color:var(--text-2); }
+
+.anchor-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px; }
+.anchor-box{ border:1px solid var(--border); border-radius:12px; padding:14px 15px; background:var(--surface-2); }
+.anchor-label{ font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin-bottom:7px; }
+.anchor-val{ font-size:17px; font-weight:800; color:var(--text); }
+.anchor-box p{ font-size:11px; color:var(--text-3); margin-top:5px; line-height:1.4; }
+
+.disclaimer{ font-size:10.5px; color:var(--text-3); line-height:1.6; padding:14px 16px; border:1px solid var(--border); border-radius:12px; background:var(--surface); margin-bottom:18px; }
+
+.cta{ background:var(--surface-2); border:1px solid var(--border); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:12px; align-items:flex-start; }
+.cta b{ color:var(--text); font-size:14.5px; }
+.cta span{ color:var(--text-2); font-size:12px; }
+.cta a{ background:linear-gradient(135deg,var(--accent-strong),var(--accent-deep)); color:#fff; font-size:12.5px; font-weight:700; padding:11px 18px; border-radius:10px; text-decoration:none; }
+
+footer{ border-top:1px solid var(--border); padding:28px 20px; text-align:center; }
+footer .flinks{ display:flex; gap:20px; justify-content:center; font-size:12px; color:var(--text-3); margin-bottom:10px; }
+footer .fcopy{ font-size:11.5px; color:var(--text-3); }
+
+@media (max-width:420px){
+  .anchor-row{ grid-template-columns:1fr; }
+  h1{ font-size:22px; }
+}
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <a class="brand" href="index.html">
+    <span class="brand-name">brunotanner</span>
+  </a>
+  <a class="back" href="reforma-tributaria.html">&larr; voltar</a>
+</div>
+
+<div class="wrap">
+
+  <div class="eyebrow">Simulador &middot; Reforma Tributária 2027</div>
+  <h1>Simples puro x Simples híbrido: veja o que muda no seu caso</h1>
+  <p class="lead">Preencha os campos abaixo com os números de uma nota fiscal real e eu calculo, na hora, quanto você paga hoje, quanto pagaria no híbrido, e o crédito que isso representa para o seu cliente. É uma estimativa simplificada.</p>
+
+  <div class="card">
+    <div class="field">
+      <label for="nota">Valor da nota fiscal</label>
+      <div class="prefix-wrap"><span class="prefix">R$</span><input type="text" inputmode="decimal" id="nota"></div>
+    </div>
+    <div class="field">
+      <label for="aliquota">Alíquota efetiva atual do Simples (DAS)</label>
+      <div class="suffix-wrap"><input type="number" id="aliquota" min="0" max="100" step="0.01"><span class="suffix">%</span></div>
+      <span class="hint" id="aliquota-hint">Calculamos automaticamente pela tabela do Anexo III, com base na sua nota × 12. Se souber o valor exato do seu DAS, pode ajustar aqui.</span>
+    </div>
+    <div class="field">
+      <label for="despesas">Despesas do mês com nota fiscal</label>
+      <div class="prefix-wrap"><span class="prefix">R$</span><input type="text" inputmode="decimal" id="despesas"></div>
+      <span class="hint">Aluguel, software, subcontratação de PJ, contabilidade etc. — só o que tem nota gera crédito de CBS/IBS no híbrido.</span>
+    </div>
+    <label class="checkbox-row" for="regulamentada">
+      <input type="checkbox" id="regulamentada">
+      Minha atividade é profissão intelectual regulamentada por conselho (advocacia, contabilidade, engenharia, arquitetura, psicologia etc.) — desconto de 30% na alíquota de CBS/IBS
+    </label>
+    <div class="error-msg" id="error-msg"></div>
+    <button id="btn-simular">Gerar comparação</button>
+  </div>
+
+  <div class="card" id="results" style="display:none;">
+    <div class="result-title">Resultado da simulação</div>
+    <div class="result-h2" id="result-headline">—</div>
+
+    <table class="cmp">
+      <tr><th></th><th>Simples puro</th><th>Simples híbrido</th></tr>
+      <tr><td>Valor da nota</td><td id="r-nota-puro">—</td><td id="r-nota-hib">—</td></tr>
+      <tr><td>Imposto no mês</td><td id="r-imp-puro">—</td><td id="r-imp-hib">—</td></tr>
+      <tr><td class="strong">Líquido tributário</td><td class="strong" id="r-liq-puro">—</td><td class="strong" id="r-liq-hib">—</td></tr>
+      <tr><td>Crédito para o cliente</td><td id="r-cred-puro">—</td><td id="r-cred-hib">—</td></tr>
+      <tr><td class="strong">Custo efetivo do cliente</td><td class="strong" id="r-custo-puro">—</td><td class="strong" id="r-custo-hib">—</td></tr>
+    </table>
+
+    <div class="callout callout-accent" id="delta-callout">—</div>
+
+    <div class="result-title" style="margin-top:20px;">As duas âncoras do seu novo preço</div>
+    <div class="anchor-row">
+      <div class="anchor-box">
+        <div class="anchor-label">Preço mínimo</div>
+        <div class="anchor-val" id="anchor-min">—</div>
+        <p>Preço no híbrido que mantém o seu líquido de hoje.</p>
+      </div>
+      <div class="anchor-box">
+        <div class="anchor-label">Preço máximo</div>
+        <div class="anchor-val" id="anchor-max">—</div>
+        <p>Preço em que o custo do cliente iguala o de hoje.</p>
+      </div>
+    </div>
+    <div class="callout callout-soft" id="anchor-note" style="margin-top:6px; display:none;"></div>
+  </div>
+
+  <div class="disclaimer">
+    Esta é uma simulação simplificada. O crédito de CBS embutido no DAS usa a tabela de partilha oficial do Simples Nacional por faixa (Anexo III, transição 2027-2028); a CBS+IBS do híbrido usa a alíquota estimada de 8,9% ainda não fixada em lei. Os números não substituem uma simulação personalizada nem orientação contábil individual. Nenhuma decisão de regime tributário deve ser tomada apenas com base neste resultado.
+  </div>
+
+  <div class="cta">
+    <b>Quer uma simulação completa, com o seu faturamento real?</b>
+    <span>Eu calculo o cenário certo pro seu CNAE, com âncoras de preço e cláusula de contrato prontas.</span>
+    <a href="https://wa.me/5547991256188" target="_blank" rel="noopener">Falar com o Bruno no WhatsApp</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="flinks">
+    <a href="politica-de-privacidade.html">Política de Privacidade</a>
+    <a href="termos-de-uso.html">Termos de Uso</a>
+  </div>
+  <div class="fcopy">&copy; 2026 Bruno Tanner. Todos os direitos reservados.</div>
+</footer>
+
+<script>
+function fmtBRL(v){
+  return v.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+}
+function fmtPct(v){
+  return v.toLocaleString('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 }) + '%';
+}
+function parseNum(id){
+  var raw = document.getElementById(id).value;
+  if (raw === '' || raw === null) return NaN;
+  return parseFloat(raw.toString().replace(',', '.'));
+}
+// Para campos em R$ com máscara de milhar (ponto) e decimal (vírgula): remove
+// os pontos de milhar antes de converter para número.
+function parseCurrency(id){
+  var raw = document.getElementById(id).value;
+  if (raw === '' || raw === null) return NaN;
+  return parseFloat(raw.toString().split('.').join('').replace(',', '.'));
+}
+// Formata um valor digitado em estilo BR (milhar com ponto, decimal com
+// vírgula) preservando o que a pessoa está digitando, inclusive vírgula
+// solta no final enquanto ela ainda digita as casas decimais.
+function formatarMilhar(valor){
+  var limpo = valor.replace(/[^\d,]/g, '');
+  var partes = limpo.split(',');
+  var inteiro = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  if (partes.length > 1){
+    return inteiro + ',' + partes[1].slice(0, 2);
+  }
+  return inteiro;
+}
+function aplicarMascaraMilhar(id){
+  var el = document.getElementById(id);
+  el.addEventListener('input', function(){
+    var distanciaDoFim = this.value.length - this.selectionStart;
+    this.value = formatarMilhar(this.value);
+    var pos = Math.max(0, this.value.length - distanciaDoFim);
+    this.setSelectionRange(pos, pos);
+  });
+}
+aplicarMascaraMilhar('nota');
+aplicarMascaraMilhar('despesas');
+
+// Percentual de CBS embutido no DAS (partilha oficial do Simples Nacional,
+// Anexo III, tabela de transição 2027-2028 — Resolução CGSN / LC 214/2025).
+// Cada faixa tem um percentual fixo de CBS dentro do DAS; o IBS fica de fora
+// deste cálculo porque, na transição, o ISS permanece no DAS (só migra pra
+// IBS gradualmente entre 2029 e 2032 — ver capítulo 3 do guia).
+// Faixas identificadas pela alíquota efetiva (fórmula oficial RBT12 x alíquota
+// nominal - parcela a deduzir, dividido por RBT12):
+var FAIXAS_ANEXO_III = [
+  { max: 6.00,  cbs: 15.43 },  // Faixa 1 — até R$180 mil
+  { max: 8.60,  cbs: 16.91 },  // Faixa 2 — R$180 a 360 mil
+  { max: 11.05, cbs: 16.41 },  // Faixa 3 — R$360 a 720 mil
+  { max: 14.02, cbs: 16.41 },  // Faixa 4 — R$720 mil a 1,8 mi
+  { max: 17.51, cbs: 15.43 },  // Faixa 5 — R$1,8 a 3,6 mi
+  { max: Infinity, cbs: 19.29 } // Faixa 6 — R$3,6 a 4,8 mi (ISS/ICMS fora do DAS)
+];
+function fracaoCBS(aliquotaPct){
+  for (var i = 0; i < FAIXAS_ANEXO_III.length; i++){
+    if (aliquotaPct <= FAIXAS_ANEXO_III[i].max) return FAIXAS_ANEXO_III[i].cbs / 100;
+  }
+  return FAIXAS_ANEXO_III[FAIXAS_ANEXO_III.length - 1].cbs / 100;
+}
+
+// Tabela oficial do Anexo III do Simples Nacional (LC 123/2006, art. 18,
+// redação da LC 155/2016): faixas de RBT12 (receita bruta dos últimos 12
+// meses), alíquota nominal e parcela a deduzir de cada faixa.
+var TABELA_RBT12_ANEXO_III = [
+  { max: 180000,   aliquotaNominal: 0.06,  deduzir: 0        },
+  { max: 360000,   aliquotaNominal: 0.112, deduzir: 9360     },
+  { max: 720000,   aliquotaNominal: 0.135, deduzir: 17640    },
+  { max: 1800000,  aliquotaNominal: 0.16,  deduzir: 35640    },
+  { max: 3600000,  aliquotaNominal: 0.21,  deduzir: 125640   },
+  { max: 4800000,  aliquotaNominal: 0.33,  deduzir: 648000   }
+];
+
+// Alíquota efetiva = (RBT12 x alíquota nominal da faixa - parcela a deduzir) / RBT12.
+// Retorna null quando o RBT12 estimado ultrapassa o teto do Simples Nacional
+// (R$4,8 milhões) — nesse caso não há faixa válida a aplicar.
+function calcularAliquotaEfetivaPorRBT12(rbt12){
+  if (!(rbt12 > 0)) return null;
+  for (var i = 0; i < TABELA_RBT12_ANEXO_III.length; i++){
+    var faixa = TABELA_RBT12_ANEXO_III[i];
+    if (rbt12 <= faixa.max){
+      var efetiva = ((rbt12 * faixa.aliquotaNominal) - faixa.deduzir) / rbt12;
+      return efetiva * 100;
+    }
+  }
+  return null;
+}
+
+// Estima o RBT12 a partir de uma única nota (nota x 12) e preenche o campo
+// de alíquota automaticamente. O campo continua editável: quem souber o
+// valor exato do próprio DAS pode sobrescrever antes de gerar a comparação.
+var aliquotaHint = document.getElementById('aliquota-hint');
+var HINT_AUTO = 'Calculamos automaticamente pela tabela do Anexo III, com base na sua nota × 12. Se souber o valor exato do seu DAS, pode ajustar aqui.';
+var HINT_TETO = 'Com esse valor, sua receita anual estimada (nota × 12) ultrapassa o teto do Simples Nacional (R$4,8 milhões). Informe manualmente a alíquota do seu DAS.';
+
+document.getElementById('nota').addEventListener('input', function(){
+  var nota = parseCurrency('nota');
+  var aliquotaInput = document.getElementById('aliquota');
+  if (isNaN(nota) || nota <= 0){
+    aliquotaHint.textContent = HINT_AUTO;
+    return;
+  }
+  var rbt12 = nota * 12;
+  var efetiva = calcularAliquotaEfetivaPorRBT12(rbt12);
+  if (efetiva === null){
+    aliquotaHint.textContent = HINT_TETO;
+    return;
+  }
+  aliquotaInput.value = efetiva.toFixed(2);
+  aliquotaHint.textContent = HINT_AUTO;
+});
+
+document.getElementById('btn-simular').addEventListener('click', function(){
+  var errBox = document.getElementById('error-msg');
+  errBox.style.display = 'none';
+
+  var nota = parseCurrency('nota');
+  var aliquota = parseNum('aliquota');
+  var despesas = parseCurrency('despesas');
+  var regulamentada = document.getElementById('regulamentada').checked;
+
+  if (isNaN(nota) || nota <= 0){
+    errBox.textContent = 'Informe o valor da nota fiscal.';
+    errBox.style.display = 'block';
+    return;
+  }
+  if (isNaN(aliquota) || aliquota <= 0 || aliquota >= 100){
+    errBox.textContent = 'Informe a alíquota efetiva do Simples (um número entre 0 e 100).';
+    errBox.style.display = 'block';
+    return;
+  }
+  if (isNaN(despesas) || despesas < 0){
+    despesas = 0;
+  }
+
+  var a = aliquota / 100;
+  var fracaoCbs = fracaoCBS(aliquota);
+  var cbsEmbutidoRate = a * fracaoCbs;
+  var dasHibridoRate = a - cbsEmbutidoRate;
+
+  var cbsIbsRate = 0.089;
+  if (regulamentada) cbsIbsRate = cbsIbsRate * 0.7;
+
+  // Simples puro
+  var impostoPuro = nota * a;
+  var liquidoPuro = nota - impostoPuro;
+  var creditoPuro = nota * cbsEmbutidoRate;
+  var custoClientePuro = nota - creditoPuro;
+
+  // Simples híbrido
+  var impostoCbsIbsBruto = nota * cbsIbsRate;
+  var creditoDespesas = despesas * cbsIbsRate;
+  var impostoCbsIbsLiquido = Math.max(0, impostoCbsIbsBruto - creditoDespesas);
+  var impostoDas = nota * dasHibridoRate;
+  var impostoHibrido = impostoDas + impostoCbsIbsLiquido;
+  var liquidoHibrido = nota - impostoHibrido;
+  var creditoHibrido = nota * cbsIbsRate;
+  var custoClienteHibrido = nota - creditoHibrido;
+
+  document.getElementById('r-nota-puro').textContent = fmtBRL(nota);
+  document.getElementById('r-nota-hib').textContent = fmtBRL(nota);
+  document.getElementById('r-imp-puro').textContent = fmtBRL(impostoPuro);
+  document.getElementById('r-imp-hib').textContent = fmtBRL(impostoHibrido);
+  document.getElementById('r-liq-puro').textContent = fmtBRL(liquidoPuro);
+  document.getElementById('r-liq-hib').textContent = fmtBRL(liquidoHibrido);
+  document.getElementById('r-cred-puro').textContent = fmtBRL(creditoPuro);
+  document.getElementById('r-cred-hib').textContent = fmtBRL(creditoHibrido);
+  document.getElementById('r-custo-puro').textContent = fmtBRL(custoClientePuro);
+  document.getElementById('r-custo-hib').textContent = fmtBRL(custoClienteHibrido);
+
+  var deltaLiquido = liquidoHibrido - liquidoPuro;
+  var deltaCusto = custoClientePuro - custoClienteHibrido;
+
+  var headline = deltaLiquido >= 0
+    ? 'No híbrido, seu líquido melhora ' + fmtBRL(Math.abs(deltaLiquido))
+    : 'No híbrido, seu líquido cai ' + fmtBRL(Math.abs(deltaLiquido)) + ' por mês';
+  document.getElementById('result-headline').textContent = headline;
+
+  var deltaCalloutHtml = deltaLiquido < 0
+    ? 'Sem mexer no preço, você perde <b>' + fmtBRL(Math.abs(deltaLiquido)) + ' de líquido por mês</b> ao migrar para o híbrido. Ao mesmo tempo, o seu cliente economiza <b>' + fmtBRL(Math.abs(deltaCusto)) + '</b>. É dentro dessa folga que mora o seu novo preço — veja as âncoras abaixo.'
+    : 'No híbrido, você ganha <b>' + fmtBRL(Math.abs(deltaLiquido)) + ' de líquido por mês</b> com as despesas informadas, e o seu cliente ainda economiza <b>' + fmtBRL(Math.abs(deltaCusto)) + '</b>.';
+  document.getElementById('delta-callout').innerHTML = deltaCalloutHtml;
+
+  // Âncoras de preço (mesma lógica do capítulo 5 do guia)
+  var denomMin = 1 - dasHibridoRate - cbsIbsRate;
+  var denomMax = 1 - cbsIbsRate;
+  var anchorNote = document.getElementById('anchor-note');
+  anchorNote.style.display = 'none';
+
+  if (denomMin > 0){
+    var precoMin = (liquidoPuro - creditoDespesas) / denomMin;
+    document.getElementById('anchor-min').textContent = fmtBRL(precoMin);
+  } else {
+    document.getElementById('anchor-min').textContent = '—';
+  }
+
+  if (denomMax > 0){
+    var precoMax = custoClientePuro / denomMax;
+    document.getElementById('anchor-max').textContent = fmtBRL(precoMax);
+  } else {
+    document.getElementById('anchor-max').textContent = '—';
+  }
+
+  if (denomMin > 0 && denomMax > 0 && precoMax < precoMin){
+    anchorNote.style.display = 'block';
+    anchorNote.textContent = 'Com essa combinação de alíquota e despesas, a faixa entre as duas âncoras ficou estreita ou invertida — vale confirmar os números com uma simulação completa.';
+  }
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
+});
+</script>
+</body>
+</html>
